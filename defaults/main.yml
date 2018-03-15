@@ -22,7 +22,10 @@ wsgi_applications:                                    # Setup your wsgi applicat
 wsgi_virtualenv: "{{deploy_dir|default('/opt/wsgi')}}/env"
 wsgi_virtualenv_python: python
 
-wsgi_service: upstart
+wsgi_service: systemd
+
+wsgi_env_file:                                        # Path to a file containing your env vars, can also be defined
+                                                      # in each WSGI application as `env_file`
 
 # UWSGI default options (can be redefined for each wsgi app)
 wsgi_uwsgi_enable_threads: no

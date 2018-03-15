@@ -2,18 +2,25 @@
 # Do NOT modify this file by hand!
 
 {% set app = item -%}
-{% set run_dir = item.run_dir|default("/opt/%s/run" % item.name) -%}
-{% set log_dir = item.log_dir|default("/opt/%s/log" % item.name) -%}
-{% set etc_dir = item.etc_dir|default("/opt/%s/etc" % item.name) -%}
-{% set env_dir = item.virtualenv|default("/opt/%s/env" % item.name) -%}
-{% set app_dir = item.app_dir|default("/opt/%s/src" % item.name) -%}
+{% set run_dir = app.run_dir|default("/opt/%s/run" % app.name) -%}
+{% set log_dir = app.log_dir|default("/opt/%s/log" % app.name) -%}
+{% set etc_dir = app.etc_dir|default("/opt/%s/etc" % app.name) -%}
+{% set env_dir = app.virtualenv|default("/opt/%s/env" % app.name) -%}
+{% set app_dir = app.app_dir|default("/opt/%s/src" % app.name) -%}
+{% set env = app.env|default({}) -%}
+{% set env_file = app.env_file|default(wsgi_env_file) -%}
 
 [Unit]
-Description=Gunicoron Instance to serve {{ app.name }}
+Description=Gunicorn Instance to serve {{ app.name }}
 After=syslog.target
 
 [Service]
-Environment={% for key in app.env|default({}) %}'{{key}}={{app.env[key]}}' {% endfor %}
+{% if env -%}
+Environment={% for key in env %}'{{key}}={{env[key]}}' {% endfor %}
+{% endif -%}
+{% if env_file -%}
+EnvironmentFile={{ env_file }}
+{% endif -%}
 
 WorkingDirectory={{app_dir}}
 User={{wsgi_user}}
